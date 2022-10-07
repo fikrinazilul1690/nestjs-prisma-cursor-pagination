@@ -16,7 +16,7 @@ export class ProductEntity implements Product {
   name: string;
 
   @ApiPropertyOptional()
-  description: string;
+  description: string | null;
 
   @Transform(({ value }) => value.toNumber())
   @ApiProperty({ type: Number })

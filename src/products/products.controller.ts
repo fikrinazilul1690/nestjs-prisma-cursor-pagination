@@ -14,6 +14,7 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import {
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
@@ -21,6 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { Page } from 'src/page/page.dto';
 import { ApiPageResponse } from 'src/page/api-page-response';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('products')
 @ApiTags('products')
@@ -29,6 +31,7 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
+  @ApiBearerAuth()
   @ApiCreatedResponse({ type: ProductEntity })
   async create(@Body() createProductDto: CreateProductDto) {
     return new ProductEntity(
@@ -37,6 +40,7 @@ export class ProductsController {
   }
 
   @Get()
+  @Public()
   @ApiOkResponse({ type: ProductEntity, isArray: true })
   async findAll() {
     const products = await this.productsService.findAll();
@@ -44,12 +48,14 @@ export class ProductsController {
   }
 
   @Get('page')
+  @Public()
   @ApiPageResponse(ProductEntity)
   async findPage(@Query() connectionArgs: ConnectionArgsDto) {
     return await this.productsService.findPage(connectionArgs);
   }
 
   @Get('drafts')
+  @ApiBearerAuth()
   @ApiOkResponse({ type: ProductEntity, isArray: true })
   async findDrafts() {
     const drafts = await this.productsService.findDrafts();
@@ -57,12 +63,14 @@ export class ProductsController {
   }
 
   @Get(':id')
+  @Public()
   @ApiOkResponse({ type: ProductEntity })
   async findOne(@Param('id') id: string) {
     return new ProductEntity(await this.productsService.findOne(id));
   }
 
   @Patch(':id')
+  @ApiBearerAuth()
   @ApiCreatedResponse({ type: ProductEntity })
   async update(
     @Param('id') id: string,
@@ -74,6 +82,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
   @ApiOkResponse({ type: ProductEntity })
   async remove(@Param('id') id: string) {
     return new ProductEntity(await this.productsService.remove(id));
